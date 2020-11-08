@@ -28,7 +28,7 @@ CREATE TABLE `Bird` (
   `featherRoutine` char(50) DEFAULT NULL,
   `socialization` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`petID`),
-  CONSTRAINT `bird_ibfk_1` FOREIGN KEY (`petID`) REFERENCES `Pet` (`petID`) ON UPDATE CASCADE
+  CONSTRAINT `bird_ibfk_1` FOREIGN KEY (`petID`) REFERENCES `Pet` (`petID`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -105,8 +105,8 @@ CREATE TABLE `CaresFor` (
   `staffID` int NOT NULL,
   PRIMARY KEY (`petID`,`staffID`),
   KEY `staffID` (`staffID`),
-  CONSTRAINT `caresfor_ibfk_1` FOREIGN KEY (`petID`) REFERENCES `Pet` (`petID`) ON UPDATE CASCADE,
-  CONSTRAINT `caresfor_ibfk_2` FOREIGN KEY (`staffID`) REFERENCES `Staff` (`staffID`) ON UPDATE CASCADE
+  CONSTRAINT `caresfor_ibfk_1` FOREIGN KEY (`petID`) REFERENCES `Pet` (`petID`) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT `caresfor_ibfk_2` FOREIGN KEY (`staffID`) REFERENCES `Staff` (`staffID`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -159,7 +159,7 @@ CREATE TABLE `HasLivingSpace` (
   `branchID` int NOT NULL,
   PRIMARY KEY (`roomNo`,`branchID`),
   KEY `branchID` (`branchID`),
-  CONSTRAINT `haslivingspace_ibfk_1` FOREIGN KEY (`branchID`) REFERENCES `Branch` (`branchID`) ON UPDATE CASCADE
+  CONSTRAINT `haslivingspace_ibfk_1` FOREIGN KEY (`branchID`) REFERENCES `Branch` (`branchID`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -187,7 +187,7 @@ CREATE TABLE `MakeBooking` (
   `endDate` date DEFAULT NULL,
   PRIMARY KEY (`confirmationID`),
   KEY `custID` (`custID`),
-  CONSTRAINT `makebooking_ibfk_1` FOREIGN KEY (`custID`) REFERENCES `Owner` (`custID`) ON UPDATE CASCADE
+  CONSTRAINT `makebooking_ibfk_1` FOREIGN KEY (`custID`) REFERENCES `Owner` (`custID`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -214,7 +214,7 @@ CREATE TABLE `Mammal` (
   `furRoutine` char(50) DEFAULT NULL,
   `nailRoutine` char(50) DEFAULT NULL,
   PRIMARY KEY (`petID`),
-  CONSTRAINT `mammal_ibfk_1` FOREIGN KEY (`petID`) REFERENCES `Pet` (`petID`) ON UPDATE CASCADE
+  CONSTRAINT `mammal_ibfk_1` FOREIGN KEY (`petID`) REFERENCES `Pet` (`petID`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -247,7 +247,7 @@ CREATE TABLE `Owner` (
   PRIMARY KEY (`custID`),
   UNIQUE KEY `email` (`email`),
   KEY `postalCode` (`postalCode`),
-  CONSTRAINT `owner_ibfk_1` FOREIGN KEY (`postalCode`) REFERENCES `PostalCode` (`postalCode`) ON UPDATE CASCADE
+  CONSTRAINT `owner_ibfk_1` FOREIGN KEY (`postalCode`) REFERENCES `PostalCode` (`postalCode`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -273,7 +273,7 @@ CREATE TABLE `PerformsService` (
   `staffID` int NOT NULL,
   PRIMARY KEY (`title`,`staffID`),
   KEY `staffID` (`staffID`),
-  CONSTRAINT `performsservice_ibfk_1` FOREIGN KEY (`staffID`) REFERENCES `Staff` (`staffID`) ON UPDATE CASCADE
+  CONSTRAINT `performsservice_ibfk_1` FOREIGN KEY (`staffID`) REFERENCES `Staff` (`staffID`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -310,9 +310,9 @@ CREATE TABLE `Pet` (
   KEY `branchID` (`branchID`),
   KEY `roomNo` (`roomNo`),
   KEY `ownerID` (`ownerID`),
-  CONSTRAINT `pet_ibfk_1` FOREIGN KEY (`branchID`) REFERENCES `Branch` (`branchID`) ON UPDATE CASCADE,
-  CONSTRAINT `pet_ibfk_2` FOREIGN KEY (`roomNo`) REFERENCES `HasLivingSpace` (`roomNo`) ON UPDATE CASCADE,
-  CONSTRAINT `pet_ibfk_3` FOREIGN KEY (`ownerID`) REFERENCES `Owner` (`custID`) ON UPDATE CASCADE
+  CONSTRAINT `pet_ibfk_1` FOREIGN KEY (`branchID`) REFERENCES `Branch` (`branchID`) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT `pet_ibfk_2` FOREIGN KEY (`roomNo`) REFERENCES `HasLivingSpace` (`roomNo`) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT `pet_ibfk_3` FOREIGN KEY (`ownerID`) REFERENCES `Owner` (`custID`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -387,7 +387,7 @@ CREATE TABLE `Reptile` (
   `isMoulting` tinyint(1) DEFAULT NULL,
   `lightConditions` char(50) DEFAULT NULL,
   PRIMARY KEY (`petID`),
-  CONSTRAINT `reptile_ibfk_1` FOREIGN KEY (`petID`) REFERENCES `Pet` (`petID`) ON UPDATE CASCADE
+  CONSTRAINT `reptile_ibfk_1` FOREIGN KEY (`petID`) REFERENCES `Pet` (`petID`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

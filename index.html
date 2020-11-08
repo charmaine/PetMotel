@@ -1,15 +1,28 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<style type="text/css">
+			table, td { border: 1px solid #000;}
+		</style>
 		<meta charset="utf-8">
 		<title>Motel Login</title>
+
 	</head>
 	<body>
 		<div class="login-form">
-			<h1>Pet Motel Login</h1>
+			<h1>Pet Motel Staff Login</h1>
 			<form action="auth" method="POST">
-				<input type="text" name="email" placeholder="Email" required>
-				<input type="password" name="password" placeholder="Password" required>
+				<input type="text" name="email" placeholder="Email" >
+				<input type="password" name="password" placeholder="Password" >
+				<input type="submit">
+			</form>
+		</div>
+
+		<div class="login-form">
+			<h1>Pet Motel Customer Login</h1>
+			<form action="cust-auth" method="POST">
+				<input type="text" name="email" placeholder="Email" >
+				<input type="password" name="password" placeholder="Password" >
 				<input type="submit">
 			</form>
 		</div>

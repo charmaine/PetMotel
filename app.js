@@ -7,7 +7,7 @@ var path = require('path');
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'newuser',
-  password : 'password',
+  password : 'newpassword',
   database : 'motel',
   multipleStatements : 'true'
 });
@@ -25,6 +25,7 @@ app.use(session({
 }));
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, '')));
 
 app.get('/', function(request, response) {
   response.sendFile(path.join(__dirname + '/index.html'));
@@ -61,7 +62,7 @@ app.post('/cust-auth', function(request, response) {
   // var password = 'princess';
   // ^ use for testing
   if (email && password) {
-    connection.query('SELECT Pet.name, Pet.age, Pet.species, Owner.email FROM Owner, Pet WHERE email = ? AND password = ? AND Pet.ownerID = Owner.custID', [email, password], function(error, results, fields) {
+    connection.query('SELECT Pet.name, Pet.age, Pet.species, Owner.firstName FROM Owner, Pet WHERE email = ? AND password = ? AND Pet.ownerID = Owner.custID', [email, password], function(error, results, fields) {
       if (results != null && results.length != 0) {
         request.session.loggedin = true;
         request.session.email = email;
@@ -111,7 +112,7 @@ app.post('/staffOptions', function(request, response) {
 INSERT
 **/
 app.get('/insert', function(request, response) {
-  let html = "<div class='login-form'><h1>Add Customer</h1><form accept-charset='utf-8' action='insert' method='GET'><input type='text' name='custID' placeholder='custID'><input type='text' name='email' placeholder='Email' ><input type='text' name='phone' placeholder='Phone Number'><input type='text' name='password' placeholder='Password'><input type='text' name='postalCode' placeholder='Postal Code'><input type='text' name='street' placeholder='Street'><input type='text' name='firstName' placeholder='First Name' ><input type='text' name='lastName' placeholder='Last Name'><input type='submit'></form></div>";
+  let html = "<link rel='stylesheet' href='home-style.css'><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'><div class='login-form'><h1>Add Customer</h1><form accept-charset='utf-8' action='insert' method='GET'><input type='text' name='custID' placeholder='custID'><input type='text' name='email' placeholder='Email' ><input type='text' name='phone' placeholder='Phone Number'><input type='text' name='password' placeholder='Password'><input type='text' name='postalCode' placeholder='Postal Code'><input type='text' name='street' placeholder='Street'><input type='text' name='firstName' placeholder='First Name' ><input type='text' name='lastName' placeholder='Last Name'><input type='submit'></form>";
   //note: there are 8 args
   let url = request.url;
   if (url.includes("&")) {
@@ -159,7 +160,7 @@ function addCustomer(a1, a2, a3, a4, a5, a6, a7, a8, callback) {
 EDIT
 **/
 app.get('/edit', function(request, response) {
-  let html = "<div class='login-form'><h1>Edit Customer Information</h1><form action='edit' method='GET'><input type='text' name='custID' placeholder='custID' ><input type='text' name='newFirstName' placeholder='New Name' ><input type='submit'></form></div>";
+  let html = "<link rel='stylesheet' href='home-style.css'><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'><div class='login-form'><h1>Edit Customer Information</h1><form action='edit' method='GET'><input type='text' name='custID' placeholder='custID' ><input type='text' name='newFirstName' placeholder='New Name' ><input type='submit'></form></div>";
   let url = request.url;
   if (url.includes("&")) {
     let custID = url.split("&")[0].split("=")[1];
@@ -186,7 +187,7 @@ function editOwner(custID, toChange, callback) {
 SELECT
 **/
 app.get('/select', function(request, response) {
-  let html = "<div class='select-form'><h1>Show Room Inhabitants</h1><form action='select-result' method='GET'><input type='text' name='branchID' placeholder='Branch ID #' ><input type='text' name='roomNo' placeholder='Room #' ><input type='submit'></form></div>";
+  let html = "<link rel='stylesheet' href='home-style.css'><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'><div class='login-form'><h1>Show Room Inhabitants</h1><form action='select-result' method='GET'><input type='text' name='branchID' placeholder='Branch ID #' ><input type='text' name='roomNo' placeholder='Room #' ><input type='submit'></form></div>";
   response.send(html);
   response.end();
 });
@@ -201,22 +202,29 @@ app.get('/select-result', function(request, response) {
     // console.log(custID);
     // console.log(newName);
     selectInhabitants(branchID, roomNo, function (results) {
-      let allResults = '<style type="text/css">table, td { border: 1px solid #000; border-collapse:collapse;}</style>';
+      let allResults = "<link rel='stylesheet' href='home-style.css'><div class='login-form'><table><tr>";
 
       petResult = results;
 
-      let petFields = ['age', 'species'];
+      let petFields = ['name', 'age', 'species'];
 
+      for (i = 0; i < petFields.length; i++) {
+        allResults += '<td>' + petFields[i] + '</td>';
+      }
+      allResults += '</tr>'
+    
       for (i = 0; i < petResult.length; i++) { // looping over pets
-        let tableResult = '<table>';
-        allResults += '<h1>' + petResult[i]['name'] + '</h1>';
+        // let tableResult = '<table>';
+        // allResults += '<h1>' + petResult[i]['name'] + '</h1>';
+        let tableResult = '<tr>';
         for (j = 0; j < petFields.length; j++) {
-          tableResult += "<tr><td>" + petFields[j] + "</td><td>" + petResult[i][petFields[j]] + "</td></tr>";
+          tableResult += "<td>" + petResult[i][petFields[j]] + "</td>";
         }
-        tableResult += '</table>';
+        tableResult += '</tr>';
         allResults += tableResult;
       }
       // console.log(results);
+      allResults += "</table></div><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'><link rel='stylesheet' href='home-style.css'>";
       send(response, allResults);
     })
   }
@@ -240,7 +248,7 @@ DELETE
 **/
 
 app.get('/delete', function(request, response) {
-  let html = "<div class='login-form'><h1>Remove Customer</h1><form action='delete-result' method='GET'><input type='text' name='custID' placeholder='custID' ><input type='submit'></form></div>";
+  let html = "<link rel='stylesheet' href='home-style.css'><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'><div class='login-form'><h1>Remove Customer</h1><form action='delete-result' method='GET'><input type='text' name='custID' placeholder='custID' ><input type='submit'></form></div>";
   response.send(html);
   response.end();
 });
@@ -262,7 +270,7 @@ app.get('/delete-result', function(request, response) {
       // console.log(results);
     })
   }
-  let html = "Customer successfully deleted.";
+  let html = "<link rel='stylesheet' href='home-style.css'><div class='login-form'>Customer successfully deleted.</div><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'>";
   response.send(html);
   response.end();
 });
@@ -272,7 +280,7 @@ JOIN
 **/
 
 app.get('/join', function(request, response) {
-  let html = "<div class='select-form'><h1>Show all pets and owners</h1><form action='join-result' method='GET'><input type='text' name='species' placeholder='e.g. Dog, Cat, Turtle' ><input type='submit'></form></div>";
+  let html = "<link rel='stylesheet' href='home-style.css'><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'><div class='login-form'><h1>Show all pets and owners</h1><form action='join-result' method='GET'><input type='text' name='species' placeholder='e.g. Dog, Cat, Turtle' ><input type='submit'></div>";
   response.send(html);
   response.end();
 });
@@ -286,7 +294,7 @@ app.get('/join-result', function(request, response) {
     // console.log(custID);
     // console.log(newName);
     joinPetOwner(species, function (results) {
-      let allResults = '<style type="text/css">table, td { border: 1px solid #000; border-collapse:collapse;}</style>';
+      let allResults = "<link rel='stylesheet' href='home-style.css'><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'><div class='login-form'>";
 
       petResult = results;
 
@@ -301,7 +309,7 @@ app.get('/join-result', function(request, response) {
         allResults += tableResult;
         allResults += "</tr>"
       }
-      allResults += '</table> <br>';
+      allResults += '</div></table>';
 
       // console.log(results);
       send(response, allResults);
@@ -327,7 +335,7 @@ DIVISION
 app.get('/division', function(request, response) {
 
     getOwnerBookingInAllBranches(function (results) {
-      let allResults = '<style type="text/css">table, td { border: 1px solid #000; border-collapse:collapse;}</style>';
+      let allResults = "<link rel='stylesheet' href='home-style.css'><div class='login-form'>";
 
       ownerResult = results;
 
@@ -342,6 +350,7 @@ app.get('/division', function(request, response) {
         allResults += tableResult;
       }
       // console.log(results);
+      allResults += "</div><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'>";
       send(response, allResults);
     })
 });
@@ -370,27 +379,40 @@ AGGREGATION WITH GROUP BY
 app.get('/aggregationGroup', function(request, response) {
 
     getAvgWeight(function (results) {
-      let allResults = '<style type="text/css">table, td { border: 1px solid #000; border-collapse:collapse;}</style>';
+      let allResults = "<link rel='stylesheet' href='home-style.css'><div class='login-form'><table><tr>";
+
 
       weightResult = results;
 
-      let weightFields = ['species', 'average weight'];
+      let weightFields = ['species', 'average weight (kg)'];
+
+
+      for (i = 0; i < weightFields.length; i++) {
+        allResults += '<td>' + weightFields[i] + '</td>';
+      }
+      allResults += '</tr>'
 
       for (i = 0; i < weightResult.length; i++) { // looping over owners
-        let tableResult = '<table>';
+        let tableResult = '<tr>';
         for (j = 0; j < weightFields.length; j++) {
-          tableResult += "<tr><td>" + weightFields[j] + "</td><td>" + weightResult[i][weightFields[j]] + "</td></tr>";
+          if (j == 1) {
+            tableResult += "<td>" + weightResult[i][weightFields[j]].toFixed(2) + "</td>";
+          } else {
+            tableResult += "<td>" + weightResult[i][weightFields[j]] + "</td>";
+          }
+          // tableResult += "<tr><td>" + weightFields[j] + "</td><td>" + weightResult[i][weightFields[j]] + "</td></tr>";
         }
-        tableResult += '</table>';
+        tableResult += '</tr>';
         allResults += tableResult;
       }
       // console.log(results);
+      allResults += "</table></div><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'>";
       send(response, allResults);
     })
 });
 
 function getAvgWeight(callback) {
-  let aggregationGroupQuery = "SELECT species, AVG(weight) AS 'average weight' FROM Pet GROUP BY species;";
+  let aggregationGroupQuery = "SELECT species, AVG(weight) AS 'average weight (kg)' FROM Pet GROUP BY species;";
   connection.query(aggregationGroupQuery, [], function(error, results) {
     return callback(results);
   });
@@ -402,19 +424,26 @@ AGGREGATION WITH HAVING
 app.get('/aggregationHaving', function(request, response) {
 
     getPetCountAnimalLovers(function (results) {
-      let allResults = '<style type="text/css">table, td { border: 1px solid #000; border-collapse:collapse;}</style>';
+      let allResults = "<link rel='stylesheet' href='home-style.css'><div class='login-form'><table><tr>";
 
       ownerResult = results;
 
       let ownerFields = ['custID', 'number of pets'];
 
+      for (i = 0; i < ownerFields.length; i++) {
+        allResults += '<td>' + ownerFields[i] + '</td>';
+      }
+      allResults += '</tr>'
+    
+
       for (i = 0; i < ownerResult.length; i++) { // looping over owners
-        let tableResult = '<table>';
+        let tableResult = '<tr>';
         for (j = 0; j < ownerFields.length; j++) {
-          tableResult += "<tr><td>" + ownerFields[j] + "</td><td>" + ownerResult[i][ownerFields[j]] + "</td></tr>";
+          tableResult += "<td>" + ownerResult[i][ownerFields[j]] + "</td>";
         }
-        tableResult += '</table>';
+        tableResult += '</tr>';
         allResults += tableResult;
+        allResults += "</table></div><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'>";
       }
       // console.log(results);
       send(response, allResults);
@@ -434,20 +463,28 @@ AGGREGATION WITH HAVING
 app.get('/nestedAggregation', function(request, response) {
 
     getYoungest(function (results) {
-      let allResults = '<style type="text/css">table, td { border: 1px solid #000; border-collapse:collapse;}</style>';
+      let allResults = "<link rel='stylesheet' href='home-style.css'><div class='login-form'><table><tr>";
+
 
       ownerResult = results;
 
       let ownerFields = ['species', 'minimum age'];
 
+      for (i = 0; i < ownerFields.length; i++) {
+        allResults += '<td>' + ownerFields[i] + '</td>';
+      }
+      allResults += '</tr>'
+    
+
       for (i = 0; i < ownerResult.length; i++) { // looping over owners
-        let tableResult = '<table>';
+        let tableResult = '<tr>';
         for (j = 0; j < ownerFields.length; j++) {
-          tableResult += "<tr><td>" + ownerFields[j] + "</td><td>" + ownerResult[i][ownerFields[j]] + "</td></tr>";
+          tableResult += "<td>" + ownerResult[i][ownerFields[j]] + "</td>";
         }
-        tableResult += '</table>';
+        tableResult += '</tr>';
         allResults += tableResult;
       }
+      allResults += "</table></div><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'>";
       // console.log(results);
       send(response, allResults);
     })
@@ -466,12 +503,15 @@ app.get('/cust-home', function(request, response) {
     var results = request.session.results;
     let petResult = results;
 
-    let allResults = '<style type="text/css">table, td { border: 1px solid #000; border-collapse:collapse;}</style>';
+    let allResults = "<link rel='stylesheet' href='home-style.css'><div class='login-form'>";
+
+    allResults += 'Welcome back, ' + petResult[0]['firstName'] + '!';
+    console.log(petResult);
 
     let petFields = ['age', 'species'];
 
     for (i = 0; i < petResult.length; i++) { // looping over pets
-      let tableResult = '<table>';
+      let tableResult = '<table class="ownerView">';
       allResults += '<h1>' + petResult[i]['name'] + '</h1>';
       for (j = 0; j < petFields.length; j++) {
         tableResult += "<tr><td>" + petFields[j] + "</td><td>" + petResult[i][petFields[j]] + "</td></tr>";
@@ -479,6 +519,7 @@ app.get('/cust-home', function(request, response) {
       tableResult += '</table>';
       allResults += tableResult;
     }
+    allResults += "</div><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'>"
     response.send(allResults);
     // console.log(results);
   } else {

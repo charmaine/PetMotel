@@ -4,27 +4,87 @@
 		<style type="text/css">
 			table, td { border: 1px solid #000;}
 		</style>
+		<link rel="stylesheet" href="index-style.css">
 		<meta charset="utf-8">
 		<title>Motel Login</title>
 
 	</head>
 	<body>
-		<div class="login-form">
-			<h1>Pet Motel Staff Login</h1>
-			<form action="auth" method="POST">
-				<input type="text" name="email" placeholder="Email" >
-				<input type="password" name="password" placeholder="Password" >
-				<input type="submit">
-			</form>
+		<div class="tab">
+			<button class="tablinks" onclick="openCity(event, 'staff')"><h2>Staff</h2></button>
+			<button class="tablinks" onclick="openCity(event, 'customer')"><h2>Customer</h2></button>
 		</div>
 
-		<div class="login-form">
+		<h2 style = "padding-left:15px"><br>Please choose your role above.</h2>
+
+		<div id="staff" class="tabcontent">
+			<div class="login-box">
+			<h2>Pet Motel Staff Login</h2>
+			<form action="auth" method="POST">
+				<div class="user-box">
+					<input type="text" name="email" required="">
+					<label>Email</label>
+				</div>
+				<div class="user-box">
+					<input type="password" name="password" required="">
+					<label>Password</label>
+				</div>
+				<div id="submit">
+					<input type="submit">
+					<span></span>
+					<span></span>
+				</div>
+			</form>
+			</div>
+		</div>
+
+
+		<div id="customer" class="tabcontent">
+			<div class="login-box">
+			<h2>Pet Motel Customer Login</h2>
+			<form action="cust-auth" method="POST">
+				<div class="user-box">
+					<input type="text" name="email" required="">
+					<label>Email</label>
+				</div>
+				<div class="user-box">
+					<input type="password" name="password" required="">
+					<label>Password</label>
+				</div>
+				<div id="submit">
+					<input type="submit">
+					<span></span>
+					<span></span>
+				</div>
+			</form>
+			</div>
+		</div>
+
+		<!-- <div class="login-box">
 			<h1>Pet Motel Customer Login</h1>
+			<div class="user-box">
 			<form action="cust-auth" method="POST">
 				<input type="text" name="email" placeholder="Email" >
 				<input type="password" name="password" placeholder="Password" >
 				<input type="submit">
 			</form>
-		</div>
+			</div>
+		</div> -->
+
+		<script>
+			function openCity(evt, tabName) {
+			  var i, tabcontent, tablinks;
+			  tabcontent = document.getElementsByClassName("tabcontent");
+			  for (i = 0; i < tabcontent.length; i++) {
+			    tabcontent[i].style.display = "none";
+			  }
+			  tablinks = document.getElementsByClassName("tablinks");
+			  for (i = 0; i < tablinks.length; i++) {
+			    tablinks[i].className = tablinks[i].className.replace(" active", "");
+			  }
+			  document.getElementById(tabName).style.display = "block";
+			  evt.currentTarget.className += " active";
+			}
+		</script>
 	</body>
 </html>

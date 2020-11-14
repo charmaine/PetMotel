@@ -97,6 +97,12 @@ app.post('/staffOptions', function(request, response) {
     response.redirect('/join')
   } else if (request.body['staffOptions'] == 'division') {
     response.redirect('/division')
+  } else if (request.body['staffOptions'] == 'aggregationGroup') {
+    response.redirect('/aggregationGroup')
+  } else if (request.body['staffOptions'] == 'aggregationHaving') {
+    response.redirect('/aggregationHaving')
+  } else if (request.body['staffOptions'] == 'nestedAggregation') {
+    response.redirect('/nestedAggregation')
   }
   response.end();
 });
@@ -114,7 +120,7 @@ app.get('/insert', function(request, response) {
     let pass = [];
     //recovers special characters from URL
     argArr[1] = argArr[1].replace("%40", "@");
-    argArr[5] = argArr[5].replace("t+", " ");
+    argArr[5] = argArr[5].split("+").join(" ");
 
     pass.push(argArr[0].split("=")[1]);
     pass.push(argArr[1].split("=")[1]);
@@ -320,17 +326,17 @@ DIVISION
 **/
 app.get('/division', function(request, response) {
 
-    getBirdBranch(function (results) {
+    getOwnerBookingInAllBranches(function (results) {
       let allResults = '<style type="text/css">table, td { border: 1px solid #000; border-collapse:collapse;}</style>';
 
-      petResult = results;
+      ownerResult = results;
 
-      let petFields = ['branchID', 'phone', 'postalCode', 'street'];
+      let ownerFields = ['custID', 'firstName', 'lastName'];
 
-      for (i = 0; i < petResult.length; i++) { // looping over pets
+      for (i = 0; i < ownerResult.length; i++) { // looping over owners
         let tableResult = '<table>';
-        for (j = 0; j < petFields.length; j++) {
-          tableResult += "<tr><td>" + petFields[j] + "</td><td>" + petResult[i][petFields[j]] + "</td></tr>";
+        for (j = 0; j < ownerFields.length; j++) {
+          tableResult += "<tr><td>" + ownerFields[j] + "</td><td>" + ownerResult[i][ownerFields[j]] + "</td></tr>";
         }
         tableResult += '</table>';
         allResults += tableResult;
@@ -340,8 +346,8 @@ app.get('/division', function(request, response) {
     })
 });
 
-function getBirdBranch(callback) {
-  let divisionQuery = "SELECT * FROM Branch WHERE NOT EXISTS (SELECT Bird.petID FROM Bird WHERE NOT EXISTS ( SELECT Pet.petID FROM Pet, Bird WHERE Pet.petID = Bird.petID AND Pet.branchID = Branch.branchID));";
+function getOwnerBookingInAllBranches(callback) {
+  let divisionQuery = "SELECT * FROM Owner WHERE NOT EXISTS (SELECT Branch.branchID FROM Branch WHERE NOT EXISTS ( SELECT Branch.branchID FROM Pet WHERE Pet.branchID = Branch.branchID AND Pet.ownerID = Owner.custID));";
   connection.query(divisionQuery, [], function(error, results) {
     return callback(results);
   });
@@ -355,6 +361,102 @@ function getPetInfo(custResult, callback) {
   connection.query('SELECT * FROM Pet WHERE ownerID = ?', [custResult], function(error, petResult, fields) {
     return callback(petResult);
 
+  });
+}
+
+/**
+AGGREGATION WITH GROUP BY
+**/
+app.get('/aggregationGroup', function(request, response) {
+
+    getAvgWeight(function (results) {
+      let allResults = '<style type="text/css">table, td { border: 1px solid #000; border-collapse:collapse;}</style>';
+
+      weightResult = results;
+
+      let weightFields = ['species', 'average weight'];
+
+      for (i = 0; i < weightResult.length; i++) { // looping over owners
+        let tableResult = '<table>';
+        for (j = 0; j < weightFields.length; j++) {
+          tableResult += "<tr><td>" + weightFields[j] + "</td><td>" + weightResult[i][weightFields[j]] + "</td></tr>";
+        }
+        tableResult += '</table>';
+        allResults += tableResult;
+      }
+      // console.log(results);
+      send(response, allResults);
+    })
+});
+
+function getAvgWeight(callback) {
+  let aggregationGroupQuery = "SELECT species, AVG(weight) AS 'average weight' FROM Pet GROUP BY species;";
+  connection.query(aggregationGroupQuery, [], function(error, results) {
+    return callback(results);
+  });
+}
+
+/**
+AGGREGATION WITH HAVING
+**/
+app.get('/aggregationHaving', function(request, response) {
+
+    getPetCountAnimalLovers(function (results) {
+      let allResults = '<style type="text/css">table, td { border: 1px solid #000; border-collapse:collapse;}</style>';
+
+      ownerResult = results;
+
+      let ownerFields = ['custID', 'number of pets'];
+
+      for (i = 0; i < ownerResult.length; i++) { // looping over owners
+        let tableResult = '<table>';
+        for (j = 0; j < ownerFields.length; j++) {
+          tableResult += "<tr><td>" + ownerFields[j] + "</td><td>" + ownerResult[i][ownerFields[j]] + "</td></tr>";
+        }
+        tableResult += '</table>';
+        allResults += tableResult;
+      }
+      // console.log(results);
+      send(response, allResults);
+    })
+});
+
+function getPetCountAnimalLovers(callback) {
+  let aggregationGroupQueryQuery = "SELECT Owner.custID, COUNT(*) AS 'number of pets' FROM Pet, Owner WHERE Pet.ownerID = Owner.custID GROUP BY Owner.custID HAVING COUNT(*) > 1;";
+  connection.query(aggregationGroupQueryQuery, [], function(error, results) {
+    return callback(results);
+  });
+}
+
+/**
+AGGREGATION WITH HAVING
+**/
+app.get('/nestedAggregation', function(request, response) {
+
+    getYoungest(function (results) {
+      let allResults = '<style type="text/css">table, td { border: 1px solid #000; border-collapse:collapse;}</style>';
+
+      ownerResult = results;
+
+      let ownerFields = ['species', 'minimum age'];
+
+      for (i = 0; i < ownerResult.length; i++) { // looping over owners
+        let tableResult = '<table>';
+        for (j = 0; j < ownerFields.length; j++) {
+          tableResult += "<tr><td>" + ownerFields[j] + "</td><td>" + ownerResult[i][ownerFields[j]] + "</td></tr>";
+        }
+        tableResult += '</table>';
+        allResults += tableResult;
+      }
+      // console.log(results);
+      send(response, allResults);
+    })
+});
+
+function getYoungest(callback) {
+  let nestedAggregationQuery = "SELECT Temp.species AS species, Temp.minage AS 'minimum age' FROM (SELECT P.species, MIN(P.age) AS minage FROM Pet P GROUP BY P.species) Temp WHERE Temp.minage = (SELECT MIN(minage) FROM (SELECT P.species, MIN(P.age) AS minage FROM Pet P GROUP BY P.species) Temp2);";
+  connection.query(nestedAggregationQuery, [], function(error, results) {
+    return callback(results);
   });
 }
 

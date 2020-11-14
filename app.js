@@ -32,6 +32,7 @@ app.get('/', function(request, response) {
 
 app.post('/auth', function(request, response) {
   var email = request.body.email;
+  console.log(email);
   var password = request.body.password;
   // var email = 'beerhouse@gmail.com';
   // var password = 'ellemayoh';
@@ -81,6 +82,7 @@ app.get('/home', function(request, response) {
   return response.sendFile(path.join(__dirname + '/home.html'));
 });
 
+//node.js/express for handling the dropdown menu
 app.post('/staffOptions', function(request, response) {
   console.log(request.body);
   if (request.body['staffOptions'] == 'insert') {
@@ -103,22 +105,46 @@ app.post('/staffOptions', function(request, response) {
 INSERT
 **/
 app.get('/insert', function(request, response) {
-  let html = "<div class='login-form'><h1>Add Customer</h1><form action='insert' method='GET'><input type='text' name='custID' placeholder='custID'><input type='text' name='email' placeholder='Email' ><input type='text' name='phone' placeholder='Phone Number'><input type='text' name='password' placeholder='Password'><input type='text' name='postalCode' placeholder='Postal Code'><input type='text' name='street' placeholder='Street'><input type='text' name='firstName' placeholder='First Name' ><input type='text' name='lastName' placeholder='Last Name'><input type='submit'></form></div>";
+  let html = "<div class='login-form'><h1>Add Customer</h1><form accept-charset='utf-8' action='insert' method='GET'><input type='text' name='custID' placeholder='custID'><input type='text' name='email' placeholder='Email' ><input type='text' name='phone' placeholder='Phone Number'><input type='text' name='password' placeholder='Password'><input type='text' name='postalCode' placeholder='Postal Code'><input type='text' name='street' placeholder='Street'><input type='text' name='firstName' placeholder='First Name' ><input type='text' name='lastName' placeholder='Last Name'><input type='submit'></form></div>";
+  //note: there are 8 args
   let url = request.url;
   if (url.includes("&")) {
     // hi abbi split the request URL so we get back all the customer info they inputted!
-    let custID = url.split("&")[0].split("=")[1];
-    console.log(custID);
-    addCustomer([ARGUMENTS], function (results) {
-      // console.log(results);
+    let argArr = url.split("&");
+    let pass = [];
+    pass.push(argArr[0].split("=")[1]);
+    pass.push(argArr[1].split("=")[1]);
+    pass.push(argArr[2].split("=")[1]);
+    pass.push(argArr[3].split("=")[1]);
+    pass.push(argArr[4].split("=")[1]);
+    pass.push(argArr[5].split("=")[1]);
+    pass.push(argArr[6].split("=")[1]);
+    pass.push(argArr[7].split("=")[1]);
+    // console.log(pass[0]);
+    // console.log(pass[1]);
+    // console.log(pass[2]);
+    // console.log(pass[3]);
+    // console.log(pass[4]);
+    // console.log(pass[5]);
+    // console.log(pass[6]);
+    // console.log(pass[7]);
+    addCustomer(pass[0],pass[1],pass[2],pass[3],pass[4],pass[5],pass[6],pass[7], function (results) {
+      console.log("called back");
     })
   }
   response.send(html);
   response.end();
 });
 
-function addCustomer([ARGUMENTS], callback) {
+function addCustomer(a1, a2, a3, a4, a5, a6, a7, a8, callback) {
   // you can look at editOwner for inspo
+  let insertQuery = "INSERT INTO Owner VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+  // [a1,a2,a3,a4,a5,a6,a7,a8]
+  // [100, a2,"a3","a4","V6T2C9","Bonn St","Harry","Welsh"]
+
+  connection.query(insertQuery, [a1,a2,a3,a4,a5,a6,a7,a8], function(error, results){
+    return callback(results);
+  })
 }
 
 

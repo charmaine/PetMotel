@@ -112,6 +112,10 @@ app.get('/insert', function(request, response) {
     // hi abbi split the request URL so we get back all the customer info they inputted!
     let argArr = url.split("&");
     let pass = [];
+    //recovers special characters from URL
+    argArr[1] = argArr[1].replace("%40", "@");
+    argArr[5] = argArr[5].replace("t+", " ");
+
     pass.push(argArr[0].split("=")[1]);
     pass.push(argArr[1].split("=")[1]);
     pass.push(argArr[2].split("=")[1]);
@@ -120,14 +124,14 @@ app.get('/insert', function(request, response) {
     pass.push(argArr[5].split("=")[1]);
     pass.push(argArr[6].split("=")[1]);
     pass.push(argArr[7].split("=")[1]);
-    // console.log(pass[0]);
-    // console.log(pass[1]);
-    // console.log(pass[2]);
-    // console.log(pass[3]);
-    // console.log(pass[4]);
-    // console.log(pass[5]);
-    // console.log(pass[6]);
-    // console.log(pass[7]);
+    console.log(pass[0]);
+    console.log(pass[1]);
+    console.log(pass[2]);
+    console.log(pass[3]);
+    console.log(pass[4]);
+    console.log(pass[5]);
+    console.log(pass[6]);
+    console.log(pass[7]);
     addCustomer(pass[0],pass[1],pass[2],pass[3],pass[4],pass[5],pass[6],pass[7], function (results) {
       console.log("called back");
     })
@@ -139,9 +143,6 @@ app.get('/insert', function(request, response) {
 function addCustomer(a1, a2, a3, a4, a5, a6, a7, a8, callback) {
   // you can look at editOwner for inspo
   let insertQuery = "INSERT INTO Owner VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-  // [a1,a2,a3,a4,a5,a6,a7,a8]
-  // [100, a2,"a3","a4","V6T2C9","Bonn St","Harry","Welsh"]
-
   connection.query(insertQuery, [a1,a2,a3,a4,a5,a6,a7,a8], function(error, results){
     return callback(results);
   })

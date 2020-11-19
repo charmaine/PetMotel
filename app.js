@@ -8,13 +8,13 @@ var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'newuser',
   password : 'password',
-  database : 'motel',
+  database : 'demoMotel',
   multipleStatements : 'true'
 });
 
 connection.connect((err) => {
   if (err) throw err;
-  console.log('Connected to MySQL Server!');
+  console.log('Connected to MySQL Server + app successfully running!');
 });
 
 var app = express();
@@ -31,13 +31,10 @@ app.get('/', function(request, response) {
   response.sendFile(path.join(__dirname + '/index.html'));
 });
 
+// Authentication for staff login
 app.post('/auth', function(request, response) {
   var email = request.body.email;
-  console.log(email);
   var password = request.body.password;
-  // var email = 'beerhouse@gmail.com';
-  // var password = 'ellemayoh';
-  // ^ use for testing
   if (email && password) {
     connection.query('SELECT * FROM Staff WHERE email = ? AND password = ?', [email, password], function(error, results, fields) {
       if (results != null && results.length != 0) {
@@ -55,12 +52,10 @@ app.post('/auth', function(request, response) {
   }
 });
 
+// Authentication for customer login
 app.post('/cust-auth', function(request, response) {
   var email = request.body.email;
   var password = request.body.password;
-  // var email = 'pmedina@gmail.com';
-  // var password = 'princess';
-  // ^ use for testing
   if (email && password) {
     connection.query('SELECT Pet.name, Pet.age, Pet.species, Owner.firstName FROM Owner, Pet WHERE email = ? AND password = ? AND Pet.ownerID = Owner.custID', [email, password], function(error, results, fields) {
       if (results != null && results.length != 0) {
@@ -69,7 +64,7 @@ app.post('/cust-auth', function(request, response) {
         request.session.results = results;
         return response.redirect('/cust-home');
       } else {
-        response.send('Incorrect Email and/or Password! Second if');
+        response.send('Incorrect Email and/or Password!');
       }
       response.end();
     });
@@ -79,13 +74,13 @@ app.post('/cust-auth', function(request, response) {
   }
 });
 
+// Home page for Staff
 app.get('/home', function(request, response) {
   return response.sendFile(path.join(__dirname + '/home.html'));
 });
 
-//node.js/express for handling the dropdown menu
+// Node.js/express for handling the dropdown menu
 app.post('/staffOptions', function(request, response) {
-  console.log(request.body);
   if (request.body['staffOptions'] == 'insert') {
     response.redirect('/insert');
   } else if (request.body['staffOptions'] == 'edit') {
@@ -112,43 +107,32 @@ app.post('/staffOptions', function(request, response) {
 INSERT
 **/
 app.get('/insert', function(request, response) {
-  let html = "<link rel='stylesheet' href='home-style.css'><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'><div class='login-form'><h1>Add Customer</h1><form accept-charset='utf-8' action='insert' method='GET'><input type='text' name='custID' placeholder='custID'><input type='text' name='email' placeholder='Email' ><input type='text' name='phone' placeholder='Phone Number'><input type='text' name='password' placeholder='Password'><input type='text' name='postalCode' placeholder='Postal Code'><input type='text' name='street' placeholder='Street'><input type='text' name='firstName' placeholder='First Name' ><input type='text' name='lastName' placeholder='Last Name'><input type='submit'></form>";
-  //note: there are 8 args
+  let html = "<link rel='stylesheet' href='home-style.css'><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'><div class='login-form insert'><h1>Add Customer</h1><form accept-charset='utf-8' action='insert' method='GET'><input type='text' name='custID' placeholder='custID'><input type='text' name='email' placeholder='Email' ><input type='text' name='phone' placeholder='Phone Number'><input type='text' name='password' placeholder='Password'><input type='text' name='postalCode' placeholder='Postal Code'><input type='text' name='street' placeholder='Street'><input type='text' name='firstName' placeholder='First Name' ><input type='text' name='lastName' placeholder='Last Name'><input type='submit'></form>";
+
+  //Note: there are 8 args
   let url = request.url;
   if (url.includes("&")) {
-    // hi abbi split the request URL so we get back all the customer info they inputted!
     let argArr = url.split("&");
     let pass = [];
-    //recovers special characters from URL
+
+    // Recovers special characters from URL
     argArr[1] = argArr[1].replace("%40", "@");
     argArr[5] = argArr[5].split("+").join(" ");
 
-    pass.push(argArr[0].split("=")[1]);
-    pass.push(argArr[1].split("=")[1]);
-    pass.push(argArr[2].split("=")[1]);
-    pass.push(argArr[3].split("=")[1]);
-    pass.push(argArr[4].split("=")[1]);
-    pass.push(argArr[5].split("=")[1]);
-    pass.push(argArr[6].split("=")[1]);
-    pass.push(argArr[7].split("=")[1]);
-    console.log(pass[0]);
-    console.log(pass[1]);
-    console.log(pass[2]);
-    console.log(pass[3]);
-    console.log(pass[4]);
-    console.log(pass[5]);
-    console.log(pass[6]);
-    console.log(pass[7]);
+    for (i = 0; i < 8; i++) {
+      pass.push(argArr[i].split("=")[1]);
+    }
+
     addCustomer(pass[0],pass[1],pass[2],pass[3],pass[4],pass[5],pass[6],pass[7], function (results) {
-      console.log("called back");
+      // Calls back
     })
   }
   response.send(html);
   response.end();
 });
 
+// Query for insert
 function addCustomer(a1, a2, a3, a4, a5, a6, a7, a8, callback) {
-  // you can look at editOwner for inspo
   let insertQuery = "INSERT INTO Owner VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
   connection.query(insertQuery, [a1,a2,a3,a4,a5,a6,a7,a8], function(error, results){
     return callback(results);
@@ -165,16 +149,15 @@ app.get('/edit', function(request, response) {
   if (url.includes("&")) {
     let custID = url.split("&")[0].split("=")[1];
     let newName = url.split("=")[2];
-    // console.log(custID);
-    // console.log(newName);
     editOwner(custID, newName, function (results) {
-      // console.log(results);
+      // Calls back
     })
   }
   response.send(html);
   response.end();
 });
 
+// Query for edit
 function editOwner(custID, toChange, callback) {
   let updateQuery = "UPDATE Owner SET firstName = ? WHERE custID = ?";
   connection.query(updateQuery, [toChange, custID], function(error, results) {
@@ -199,8 +182,6 @@ app.get('/select-result', function(request, response) {
   if (url.includes("&")) {
     let branchID = url.split("&")[0].split("=")[1];
     let roomNo = url.split("=")[2];
-    // console.log(custID);
-    // console.log(newName);
     selectInhabitants(branchID, roomNo, function (results) {
       let allResults = "<link rel='stylesheet' href='home-style.css'><div class='login-form'><table><tr>";
 
@@ -214,8 +195,6 @@ app.get('/select-result', function(request, response) {
       allResults += '</tr>'
 
       for (i = 0; i < petResult.length; i++) { // looping over pets
-        // let tableResult = '<table>';
-        // allResults += '<h1>' + petResult[i]['name'] + '</h1>';
         let tableResult = '<tr>';
         for (j = 0; j < petFields.length; j++) {
           tableResult += "<td>" + petResult[i][petFields[j]] + "</td>";
@@ -223,7 +202,6 @@ app.get('/select-result', function(request, response) {
         tableResult += '</tr>';
         allResults += tableResult;
       }
-      // console.log(results);
       allResults += "</table></div><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'><link rel='stylesheet' href='home-style.css'>";
       send(response, allResults);
     })
@@ -235,6 +213,7 @@ function send(response, allResults) {
   response.end();
 }
 
+// Query for select
 function selectInhabitants(branchID, roomNo, callback) {
   let selectQuery = "SELECT * FROM Pet WHERE branchID = ? AND roomNo = ?";
   connection.query(selectQuery, [branchID, roomNo], function(error, results) {
@@ -253,8 +232,8 @@ app.get('/delete', function(request, response) {
   response.end();
 });
 
+// Query for delete
 function deleteCust(custID, callback) {
-  console.log(custID);
   let deleteQuery = "DELETE FROM Owner WHERE custID = ?";
   connection.query(deleteQuery, [custID], function(error, results) {
     return callback(results);
@@ -265,9 +244,8 @@ app.get('/delete-result', function(request, response) {
   let url = request.url;
   if (url.includes("?")) {
     let custID = url.split("=")[1];
-    // console.log(newName);
     deleteCust(custID, function (results) {
-      // console.log(results);
+      // Calls back
     })
   }
   let html = "<link rel='stylesheet' href='home-style.css'><div class='login-form'>Customer successfully deleted.</div><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'>";
@@ -291,8 +269,6 @@ app.get('/join-result', function(request, response) {
 
   if (url.includes("?")) {
     let species = url.split("=")[1];
-    // console.log(custID);
-    // console.log(newName);
     joinPetOwner(species, function (results) {
       let allResults = "<link rel='stylesheet' href='home-style.css'><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'><div class='login-form'>";
 
@@ -311,7 +287,6 @@ app.get('/join-result', function(request, response) {
       }
       allResults += '</div></table>';
 
-      // console.log(results);
       send(response, allResults);
     })
   }
@@ -322,6 +297,7 @@ function send(response, allResults) {
   response.end();
 }
 
+// Query for join
 function joinPetOwner(species, callback) {
   let joinQuery = "SELECT Owner.firstName, Owner.lastName, Pet.name FROM Pet, Owner WHERE species = ? AND Owner.custID = Pet.ownerID";
   connection.query(joinQuery, [species], function(error, results) {
@@ -335,26 +311,32 @@ DIVISION
 app.get('/division', function(request, response) {
 
     getOwnerBookingInAllBranches(function (results) {
-      let allResults = "<link rel='stylesheet' href='home-style.css'><div class='login-form'>";
+      let allResults = "<link rel='stylesheet' href='home-style.css'><div class='login-form'><table><tr>";
 
       ownerResult = results;
 
       let ownerFields = ['custID', 'firstName', 'lastName'];
 
+      for (i = 0; i < ownerFields.length; i++) {
+        allResults += '<td>' + ownerFields[i] + '</td>';
+      }
+      allResults += '</tr>';
+
       for (i = 0; i < ownerResult.length; i++) { // looping over owners
-        let tableResult = '<table>';
+        let tableResult = '<tr>';
         for (j = 0; j < ownerFields.length; j++) {
-          tableResult += "<tr><td>" + ownerFields[j] + "</td><td>" + ownerResult[i][ownerFields[j]] + "</td></tr>";
+          tableResult += "<td>" + ownerResult[i][ownerFields[j]] + "</td>";
         }
-        tableResult += '</table>';
+        tableResult += "</tr>";
         allResults += tableResult;
       }
-      // console.log(results);
+      allResults += '</table>';
       allResults += "</div><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'>";
       send(response, allResults);
     })
 });
 
+// Query for division
 function getOwnerBookingInAllBranches(callback) {
   let divisionQuery = "SELECT * FROM Owner WHERE NOT EXISTS (SELECT Branch.branchID FROM Branch WHERE NOT EXISTS ( SELECT Branch.branchID FROM Pet WHERE Pet.branchID = Branch.branchID AND Pet.ownerID = Owner.custID));";
   connection.query(divisionQuery, [], function(error, results) {
@@ -400,17 +382,16 @@ app.get('/aggregationGroup', function(request, response) {
           } else {
             tableResult += "<td>" + weightResult[i][weightFields[j]] + "</td>";
           }
-          // tableResult += "<tr><td>" + weightFields[j] + "</td><td>" + weightResult[i][weightFields[j]] + "</td></tr>";
         }
         tableResult += '</tr>';
         allResults += tableResult;
       }
-      // console.log(results);
       allResults += "</table></div><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'>";
       send(response, allResults);
     })
 });
 
+// Query for aggregation with group by
 function getAvgWeight(callback) {
   let aggregationGroupQuery = "SELECT species, AVG(weight) AS 'average weight (kg)' FROM Pet GROUP BY species;";
   connection.query(aggregationGroupQuery, [], function(error, results) {
@@ -443,13 +424,13 @@ app.get('/aggregationHaving', function(request, response) {
         }
         tableResult += '</tr>';
         allResults += tableResult;
-        allResults += "</table></div><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'>";
       }
-      // console.log(results);
+      allResults += "</table></div><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'>";
       send(response, allResults);
     })
 });
 
+// Query for aggregation with having
 function getPetCountAnimalLovers(callback) {
   let aggregationGroupQueryQuery = "SELECT Owner.custID, COUNT(*) AS 'number of pets' FROM Pet, Owner WHERE Pet.ownerID = Owner.custID GROUP BY Owner.custID HAVING COUNT(*) > 1;";
   connection.query(aggregationGroupQueryQuery, [], function(error, results) {
@@ -458,7 +439,7 @@ function getPetCountAnimalLovers(callback) {
 }
 
 /**
-AGGREGATION WITH HAVING
+NESTED AGGREGATION
 **/
 app.get('/nestedAggregation', function(request, response) {
 
@@ -485,11 +466,11 @@ app.get('/nestedAggregation', function(request, response) {
         allResults += tableResult;
       }
       allResults += "</table></div><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'>";
-      // console.log(results);
       send(response, allResults);
     })
 });
 
+// Query for nested aggregation
 function getYoungest(callback) {
   let nestedAggregationQuery = "SELECT Temp.species AS species, Temp.minage AS 'minimum age' FROM (SELECT P.species, MIN(P.age) AS minage FROM Pet P GROUP BY P.species) Temp WHERE Temp.minage = (SELECT MIN(minage) FROM (SELECT P.species, MIN(P.age) AS minage FROM Pet P GROUP BY P.species) Temp2);";
   connection.query(nestedAggregationQuery, [], function(error, results) {
@@ -497,6 +478,7 @@ function getYoungest(callback) {
   });
 }
 
+// Home page for customer
 app.get('/cust-home', function(request, response) {
   if (request.session.loggedin) {
     var email = request.session.email;
@@ -506,7 +488,6 @@ app.get('/cust-home', function(request, response) {
     let allResults = "<link rel='stylesheet' href='home-style.css'><div class='login-form'>";
 
     allResults += 'Welcome back, ' + petResult[0]['firstName'] + '!';
-    console.log(petResult);
 
     let petFields = ['age', 'species'];
 
@@ -521,7 +502,6 @@ app.get('/cust-home', function(request, response) {
     }
     allResults += "</div><input type='button' style='padding:15px 15px; margin:15px;' value='Go back!' onclick='history.back()'>"
     response.send(allResults);
-    // console.log(results);
   } else {
     response.send('Please login to view this page!');
   }

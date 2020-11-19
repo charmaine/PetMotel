@@ -42,6 +42,11 @@ html {
     text-align: center;
   }
 
+  .insert form{
+    display: flex;
+    flex-direction: row;
+  }
+
   input, select#staffOptions {
       position: relative;
       display: inline-block;

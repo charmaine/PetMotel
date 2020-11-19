@@ -7,7 +7,7 @@ var path = require('path');
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'newuser',
-  password : 'newpassword',
+  password : 'password',
   database : 'motel',
   multipleStatements : 'true'
 });
@@ -212,7 +212,7 @@ app.get('/select-result', function(request, response) {
         allResults += '<td>' + petFields[i] + '</td>';
       }
       allResults += '</tr>'
-    
+
       for (i = 0; i < petResult.length; i++) { // looping over pets
         // let tableResult = '<table>';
         // allResults += '<h1>' + petResult[i]['name'] + '</h1>';
@@ -434,7 +434,7 @@ app.get('/aggregationHaving', function(request, response) {
         allResults += '<td>' + ownerFields[i] + '</td>';
       }
       allResults += '</tr>'
-    
+
 
       for (i = 0; i < ownerResult.length; i++) { // looping over owners
         let tableResult = '<tr>';
@@ -474,7 +474,7 @@ app.get('/nestedAggregation', function(request, response) {
         allResults += '<td>' + ownerFields[i] + '</td>';
       }
       allResults += '</tr>'
-    
+
 
       for (i = 0; i < ownerResult.length; i++) { // looping over owners
         let tableResult = '<tr>';

@@ -5,7 +5,7 @@ This full-stack web application is built for staff and customers of a Pet Motel.
 
 The user journey starts with the user selecting if they are a `Staff` or `Customer` at the pet motel. They will then be prompted to log in, their credentials are validated against profiles we have in our database.
 
-Upon signing in, customers will have the ability to view all their pets and their profiles. Staffs will have the option to add or remove a customer, edit an existing customer's profile, show all pets and owners, and check room inhabitants. We also added in special filtering functionalities so staff could pull up their most loyal customers (owners with a pet in every branch of the pet motel!), find the average weight of species, find the number of pets owned by pet lovers (fun party trick!), and find the youngest age of every species (we have to take good care of the little ones)! 
+Upon signing in, customers will have the ability to view all their pets and their profiles. Staffs will have the option to add or remove a customer, edit an existing customer's profile, show all pets and owners, and check room inhabitants. We also added in special filtering functionalities so staff could pull up their most loyal customers (owners with a pet in every branch of the pet motel!), find the average weight of species, find the number of pets owned by pet lovers (which of our customers own the most pets, how many?), and find the youngest age of every species (we have to take good care of the little ones)!
 
 
 

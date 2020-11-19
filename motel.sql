@@ -288,7 +288,7 @@ Insert into Pet values ('Lucky', '/photos/000000026.jpg', 0.52, 'M', 2, 'Cockati
 Insert into Pet values ('Reese', '/photos/000000027.jpg', 27.2, 'M', 5, 'Dog', 'Dry', 27, 2, 201, 17);
 Insert into Pet values ('Tilly', '/photos/000000028.jpg', 17.2, 'F', 7, 'Cat', 'Dry', 28, 3, 301, 17);
 Insert into Pet values ('Mia', '/photos/000000029.jpg', 9.2, 'F', 12, 'Turtle', 'Fresh', 29, 4, 401, 17);
-Insert into Pet values ('Juliet', '/photos/000000030.jpg', 1.2, 'F', 1, 'Snake', 'Fresh', 30, 5, 501, 17);
+Insert into Pet values ('Juliet', '/photos/000000030.jpg', 1.2, 'F', 2, 'Snake', 'Fresh', 30, 5, 501, 17);
 
 Insert into Mammal values (2, 'Aggressive', 'Brush', 'Clip');
 Insert into Mammal values (8, 'Shy', 'Brush', 'Paint');

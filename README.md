@@ -25,3 +25,8 @@ Upon signing in, customers will have the ability to view all their pets and thei
 7. Replace `host`, `user`, and `password` in `app.js` with your MySQL database credentials
 7. Run `node app.js` to start application
 8. Your app will be running at `http://localhost:3000/` by default
+
+## Created By
+- Karen Lau
+- Charmaine Lee
+- Abbi Yuniarto
